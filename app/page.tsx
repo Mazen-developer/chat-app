@@ -1,65 +1,63 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState ,useEffect } from "react";
+type UserType = {
+  id: number;
+  name: string;
+  // أي خصائص تانية
+};
+export default function AddUser() {
+
+const [messages, setmessage] = useState<UserType[]>([]);
+  const [name, setName] = useState("");
+
+async function addUser() {
+  const res = await fetch("/api/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  const newUser = await res.json();
+
+  // ضيفه فوراً في الواجهة
+setmessage((prev) => [newUser, ...prev]);
+
+  setName("");
+}
+
+useEffect(()=>{
+getUsers()
+})
+async function getUsers(){
+const res =  await fetch("/api/users")
+const data = await res.json()
+setmessage(data)
+}
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="flex bg-amber-100/70 flex-col justify-end items-center h-screen w-full">
+      
+<div className="">
+{messages.map((message:any)=>(
+<div  className="bg-amber-300 rounded-2xl my-3 px-2 w-fit" key={message._id}>
+<p>{message.name}</p>
+</div>
+))}
+<div className=" my-2">
+      <input
+      className="bg-white rounded-2xl px-2 shadow-sm"
+        placeholder="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+                                   
+      <button className="bg-amber-100 rounded-2xl px-4" onClick={ async()=>{
+       await addUser()
+      }}>send</button>
+</div>
+</div>
     </div>
   );
 }
